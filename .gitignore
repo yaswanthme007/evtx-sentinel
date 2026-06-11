@@ -1,0 +1,6 @@
+logs/*.jsonl
+__pycache__/
+**/__pycache__/
+.env
+*.pyc
+venv/
