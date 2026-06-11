@@ -22,7 +22,9 @@ autonomously from start to finish. Do not pause for confirmation. Deliver findin
 
 ### PHASE 1 — TRIAGE
 
-1. Discover all `.evtx` files under `./evidence/` using `list_evtx_files("./evidence/")`.
+1. Discover all `.evtx` files using `list_evtx_files(<dir>)`, where `<dir>` is the path set
+   by the `EVTX_CASE_DIR` environment variable. If `EVTX_CASE_DIR` is not set, fall back to
+   `./evidence/`.
 2. For each file, call `register_evidence(<path>)` and record the returned `file_id`.
 3. For each `file_id`:
    - Call `run_sigma_scan(file_id, min_level="medium")` — collect all returned findings.

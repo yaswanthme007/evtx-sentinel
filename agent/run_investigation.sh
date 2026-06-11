@@ -14,6 +14,9 @@ fi
 
 CASE_DIR="$(realpath "$1")"
 
+export HAYABUSA_BIN=/opt/hayabusa/hayabusa
+export EVTXECMD_BIN=/opt/zimmermantools/EvtxeCmd/EvtxECmd.dll
+
 if [[ ! -d "${CASE_DIR}" ]]; then
     echo "Error: case directory does not exist: ${CASE_DIR}" >&2
     exit 1
@@ -30,5 +33,5 @@ echo "Investigation protocol installed: ${CASE_DIR}/CLAUDE.md"
 mkdir -p "${CASE_DIR}/evidence" "${CASE_DIR}/reports"
 
 echo "Launching investigation in: ${CASE_DIR}"
-cd "${CASE_DIR}"
-exec claude
+cd /home/sansforensics/work/evtx-sentinel
+exec EVTX_CASE_DIR="${CASE_DIR}" claude --add-dir "${CASE_DIR}"
