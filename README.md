@@ -1,48 +1,82 @@
 # evtx-sentinel
 
-A read-only typed MCP server for Windows Event Log analysis on SIFT Workstation, driven by Claude Code with a 4-phase self-correcting validation loop. Built for the SANS FIND EVIL! Hackathon 2026.
+evtx-sentinel is a read-only MCP (Model Context Protocol) server for Windows Event Log
+analysis, purpose-built for DFIR investigations on SANS SIFT Workstation. It exposes six
+typed tools — evidence registration, Sigma scanning via Hayabusa, logon summarisation,
+raw event retrieval, and finding verification — each with mandatory SHA-256 audit logging
+and strict read-only evidence access enforced at the code level, not just by prompt instruction.
 
-## Overview
+Claude Code drives the server through a four-phase self-correcting investigation protocol:
+triage all EVTX files, validate every draft finding against raw event records, correct
+field-attribution errors discovered during validation, then emit a structured Markdown report.
+On the EVTX-ATTACK-SAMPLES benchmark (39 files, 53 draft findings) the system caught and
+corrected 17 hallucinations in a single automated pass, ending with 53 verified findings,
+zero false positives discarded, and zero uncorrected field errors — completing in 19 minutes.
 
-evtx-sentinel exposes Windows Event Log (`.evtx`) analysis capabilities as MCP tools consumable by Claude Code. It integrates Hayabusa and EvtxECmd as read-only analysis backends, wrapping their output in structured, typed responses with full audit logging.
+---
 
-## Architecture
-
-```
-Claude Code
-    │
-    ▼  stdio
-MCP Server (server/)
-    │
-    ├── Hayabusa  (/opt/hayabusa/hayabusa)
-    └── EvtxECmd  (/opt/zimmermantools/EvtxeCmd/EvtxECmd.dll)
-```
-
-## Quick Start
+## Quick Start for Judges
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# 1. Install the MCP server dependency (on SIFT)
+pip3 install mcp==1.9.3
 
-# Run the MCP server
-python server/main.py
+# 2. Register the MCP server with Claude Code
+claude mcp add evtx-sentinel -- python3 /home/sansforensics/work/evtx-sentinel/server/mcp_server.py
+
+# 3. Run an investigation against your case directory
+bash /home/sansforensics/work/evtx-sentinel/agent/run_investigation.sh /path/to/case/evtx/
+
+# The script:
+#   - exports HAYABUSA_BIN and EVTXECMD_BIN
+#   - installs the investigation protocol (CLAUDE.md) into the case directory
+#   - launches Claude Code with the case directory added to its context
 ```
 
-## Environment Variables
+The agent runs fully autonomously. Final report is written to `<case_dir>/reports/`.
 
-| Variable | Default | Description |
-|---|---|---|
-| `HAYABUSA_BIN` | `/opt/hayabusa/hayabusa` | Path to Hayabusa binary |
-| `EVTXECMD_BIN` | `/opt/zimmermantools/EvtxeCmd/EvtxECmd.dll` | Path to EvtxECmd DLL |
+---
 
-## Audit Logging
+## Requirements
 
-Every tool call is appended to `logs/execution_log.jsonl` with timestamp, tool name, arguments, result hash (SHA-256), and duration.
+| Component | Version | Notes |
+|-----------|---------|-------|
+| SIFT Workstation | 2026-04-22 or later | Ubuntu 24.04 base |
+| Claude Code | 2.x | CLI; `claude` must be on PATH |
+| Python | 3.12 | System Python on SIFT |
+| Hayabusa | 3.9.0 | Must be at `/opt/hayabusa/hayabusa` or set `HAYABUSA_BIN` |
+| dotnet runtime | 6.0 | Required for EvtxECmd; runtime-only, no SDK needed |
+| mcp (Python) | 1.9.3 | Only non-stdlib dependency; pinned in `requirements.txt` |
 
-## Platform
+---
 
-SIFT Workstation · Ubuntu 24.04 · Python 3.12 · MCP stdio transport
+## Architecture Summary
+
+The MCP server (`server/mcp_server.py`) runs as a subprocess of Claude Code over stdio
+transport. It enforces evidence integrity architecturally: every file handle is opened
+read-only, SHA-256 is computed at intake, unregistered file IDs are rejected before any
+subprocess spawns, and no generic shell execution is exposed. The agent layer adds a
+behavioural protocol (four-phase loop, max-3-iterations cap, UTC-only timestamps) on top.
+See [docs/architecture.md](docs/architecture.md) for the full component diagram, trust
+boundary breakdown, and self-correction flow.
+
+---
+
+## Accuracy
+
+On the 39-file EVTX-ATTACK-SAMPLES benchmark:
+
+- **53 verified findings**, 0 false positives discarded
+- **17 hallucinations caught** (Sysmon EID 8/10 SrcProc vs. TgtProc field mismatch)
+- **17 self-corrections** applied in Phase 3 via `get_event_detail`
+- **1 iteration**, 19-minute runtime
+- Baseline (Protocol SIFT stock) produced 1 uncaught process attribution error on the same dataset
+
+See [docs/accuracy_report.md](docs/accuracy_report.md) for the full self-assessment including
+known limitations and failure modes tested.
+
+---
 
 ## License
 
-MIT License © 2026 kbyas
+MIT License © 2026 yaswanthme007
