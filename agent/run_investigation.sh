@@ -34,4 +34,5 @@ mkdir -p "${CASE_DIR}/evidence" "${CASE_DIR}/reports"
 
 echo "Launching investigation in: ${CASE_DIR}"
 cd /home/sansforensics/work/evtx-sentinel
-exec EVTX_CASE_DIR="${CASE_DIR}" claude --add-dir "${CASE_DIR}"
+export EVTX_CASE_DIR="${CASE_DIR}"
+exec claude --add-dir "${CASE_DIR}"
