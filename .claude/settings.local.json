@@ -6,7 +6,8 @@
       "mcp__evtx-sentinel__run_sigma_scan",
       "mcp__evtx-sentinel__get_logon_summary",
       "mcp__evtx-sentinel__verify_finding",
-      "mcp__evtx-sentinel__get_event_detail"
+      "mcp__evtx-sentinel__get_event_detail",
+      "mcp__evtx-sentinel__list_evtx_files"
     ]
   }
 }

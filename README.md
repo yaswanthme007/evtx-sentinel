@@ -64,12 +64,19 @@ boundary breakdown, and self-correction flow.
 
 ## Accuracy
 
-On the 39-file EVTX-ATTACK-SAMPLES benchmark:
+| | Run 1 — Demo (Video) | Run 2 — Full Benchmark |
+|---|---|---|
+| EVTX files | 3 | 39 |
+| Draft findings generated | 8 | 53 |
+| Findings confirmed | 8 | 53 |
+| Self-corrections applied | 4 | 17 |
+| Self-correction iterations | 1 | 1 |
+| Runtime | 4 minutes 16 seconds | 19 minutes |
 
-- **53 verified findings**, 0 false positives discarded
-- **17 hallucinations caught** (Sysmon EID 8/10 SrcProc vs. TgtProc field mismatch)
-- **17 self-corrections** applied in Phase 3 via `get_event_detail`
-- **1 iteration**, 19-minute runtime
+The demo video shows Run 1. The full benchmark report is committed at reports/BASELINE-001_investigation_report.md.
+
+- **Zero false positives discarded** across both runs
+- **Hallucinations caught**: Sysmon EID 8/10 SrcProc vs. TgtProc field mismatch
 - Baseline (Protocol SIFT stock) produced 1 uncaught process attribution error on the same dataset
 
 See [docs/accuracy_report.md](docs/accuracy_report.md) for the full self-assessment including

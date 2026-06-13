@@ -6,6 +6,21 @@
 
 ---
 
+## Investigation Runs
+
+| | Run 1 — Demo (Video) | Run 2 — Full Benchmark |
+|---|---|---|
+| EVTX files | 3 | 39 |
+| Draft findings generated | 8 | 53 |
+| Findings confirmed | 8 | 53 |
+| Self-corrections applied | 4 | 17 |
+| Self-correction iterations | 1 | 1 |
+| Runtime | 4 minutes 16 seconds | 19 minutes |
+
+The demo video shows Run 1. The full benchmark report is committed at reports/BASELINE-001_investigation_report.md.
+
+---
+
 ## Baseline Performance — Protocol SIFT (Stock)
 
 The baseline condition ran the same 39 EVTX files through the standard SIFT forensic workflow
